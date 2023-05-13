@@ -11,4 +11,9 @@ ${procces.env.DB_USER} evabe bosate hbe
 6.await client.close(); comment this line or you will eat errors
 
 
+
+7.to show data to the ui we use 'APP.GET'
+8.to save data that we recived from the ui we use 'APP.POST'
+9.app.use(express.json())
+
 */

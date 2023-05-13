@@ -3,12 +3,12 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 7979 
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 // middlware
 app.use(cors())
-app.use(express())
+app.use(express.json())
 
 // 69-car
 // 70oM5J90m6jkZB4C
@@ -32,8 +32,9 @@ async function run() {
     await client.connect();
 
 const serviceCollection = client.db('69-carDB').collection('69-car')
+const bookingCollection = client.db('69-carDB').collection('bookings')
 
-
+// homepage services data load 
 app.get('/services' , async (req, res)=>{
     const cursor = serviceCollection.find()
     const result = await cursor.toArray() 
@@ -41,26 +42,52 @@ app.get('/services' , async (req, res)=>{
 
 })
 
+// specific data load for checkout page
+// to show data to the ui we use 'APP.GET'
+app.get('/services/:id', async(req , res)=>{
+  const id = req.params.id 
+  const query = { _id: new ObjectId(id) }
+
+  const options = {
+    // Include only the `title` and `imdb` fields in the returned document
+    projection: { title: 1, service_id: 1 , price: 1},
+  };
+
+  const result = await serviceCollection.findOne(query , options)
+  res.send(result)
+})
 
 
+// bookings 
+
+app.get('/bookings', async(req, res)=>{
+  console.log(req.query.email)
+  let query = {}
+  if(req.query,email){
+    query = {email : req.query.email} 
+  }
+  const result = await bookingCollection.find(query).toArray()
+  res.send(result)
+})
 
 
+// to save the data we recived from the ui 
+ app.post('/bookings', async(req, res)=>{
+  const booking = req.body ;
+  console.log(booking)
+  const result = await bookingCollection.insertOne(booking)
+  res.send(result)
+  
+})
 
+ 
 
+/* app.post('/bookings', async(req,res)=>{
+const booking = req.body 
+console.log(booking)
+})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+ */
 
 
     // Send a ping to confirm a successful connection
@@ -72,19 +99,6 @@ app.get('/services' , async (req, res)=>{
   }
 }
 run().catch(console.dir);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
