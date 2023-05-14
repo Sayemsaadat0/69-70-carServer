@@ -16,4 +16,20 @@ ${procces.env.DB_USER} evabe bosate hbe
 8.to save data that we recived from the ui we use 'APP.POST'
 9.app.use(express.json())
 
+
+
+(require('crypto').randomBytes(64).toString('hex')  = it can generate token)
+10. npm install jsonwebtoken > 
+
+
+
+
+
+const corsConfig = {
+    origin: '',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}
+app.use(cors(corsConfig))
+app.options("", cors(corsConfig))
 */

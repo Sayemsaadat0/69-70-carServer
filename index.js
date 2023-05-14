@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const jwt = require('jsonwebtoken')
 const app = express()
 const port = process.env.PORT || 7979 
 require('dotenv').config()
@@ -50,7 +51,7 @@ app.get('/services/:id', async(req , res)=>{
 
   const options = {
     // Include only the `title` and `imdb` fields in the returned document
-    projection: { title: 1, service_id: 1 , price: 1},
+    projection: { title: 1, service_id: 1 , price: 1 , img: 1},
   };
 
   const result = await serviceCollection.findOne(query , options)
@@ -63,7 +64,7 @@ app.get('/services/:id', async(req , res)=>{
 app.get('/bookings', async(req, res)=>{
   console.log(req.query.email)
   let query = {}
-  if(req.query,email){
+  if(req.query?.email){
     query = {email : req.query.email} 
   }
   const result = await bookingCollection.find(query).toArray()
@@ -79,8 +80,29 @@ app.get('/bookings', async(req, res)=>{
   res.send(result)
   
 })
+// update 
+app.patch('/bookings/:id', async(req, res)=>{
+   const id = req.params.id 
+   const filter = { _id: new ObjectId(id)}
+   const updateBooking = req.body
+   const updateDoc = {
+    $set: {
+    status : updateBooking.status
+    },
+  };
 
- 
+   console.log(updateBooking)
+   const result = await bookingCollection.updateOne(filter,updateDoc)
+   res.send(result)
+})
+
+// for delete the data  we have on our ui 
+ app.delete('/bookings/:id', async(req, res)=>{
+  const id = req.params.id 
+  const query = { _id: new ObjectId(id)}
+  const result = await bookingCollection.deleteOne(query)
+  res.send(result)
+ })
 
 /* app.post('/bookings', async(req,res)=>{
 const booking = req.body 
