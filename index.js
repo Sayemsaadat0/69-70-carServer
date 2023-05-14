@@ -11,10 +11,6 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 app.use(cors())
 app.use(express.json())
 
-// 69-car
-// 70oM5J90m6jkZB4C
-
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.njebycd.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -32,35 +28,61 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+
+// collection  
 const serviceCollection = client.db('69-carDB').collection('69-car')
 const bookingCollection = client.db('69-carDB').collection('bookings')
+// ........................................ 
+
+
+
+// JWT 
+app.post('/jwt', (req, res)=>{
+  const user = req.body 
+  console.log(user)
+  // 3ta value, 1.ami kar jnne access token baanacchi, 2.access token 3. accesss token kotokkkhn thakbe
+  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET , {expiresIn : '1h'})
+  res.send({token})
+})
+
+
+
+
+
+
+
+
+
+
 
 // homepage services data load 
 app.get('/services' , async (req, res)=>{
     const cursor = serviceCollection.find()
     const result = await cursor.toArray() 
     res.send(result)
-
 })
+//.......................................
+
+
 
 // specific data load for checkout page
 // to show data to the ui we use 'APP.GET'
 app.get('/services/:id', async(req , res)=>{
   const id = req.params.id 
   const query = { _id: new ObjectId(id) }
-
   const options = {
     // Include only the `title` and `imdb` fields in the returned document
     projection: { title: 1, service_id: 1 , price: 1 , img: 1},
   };
-
   const result = await serviceCollection.findOne(query , options)
   res.send(result)
 })
+//.....................................
 
 
-// bookings 
 
+
+// bookings /checkout
 app.get('/bookings', async(req, res)=>{
   console.log(req.query.email)
   let query = {}
@@ -70,6 +92,9 @@ app.get('/bookings', async(req, res)=>{
   const result = await bookingCollection.find(query).toArray()
   res.send(result)
 })
+//.................................
+
+
 
 
 // to save the data we recived from the ui 
@@ -78,9 +103,12 @@ app.get('/bookings', async(req, res)=>{
   console.log(booking)
   const result = await bookingCollection.insertOne(booking)
   res.send(result)
-  
 })
-// update 
+//................................
+
+
+// update  information 
+// by gettting customer information 
 app.patch('/bookings/:id', async(req, res)=>{
    const id = req.params.id 
    const filter = { _id: new ObjectId(id)}
@@ -90,26 +118,22 @@ app.patch('/bookings/:id', async(req, res)=>{
     status : updateBooking.status
     },
   };
-
    console.log(updateBooking)
    const result = await bookingCollection.updateOne(filter,updateDoc)
    res.send(result)
 })
+// ..................................
+
 
 // for delete the data  we have on our ui 
+// if any customer want to delete some of their order 
  app.delete('/bookings/:id', async(req, res)=>{
   const id = req.params.id 
   const query = { _id: new ObjectId(id)}
   const result = await bookingCollection.deleteOne(query)
   res.send(result)
  })
-
-/* app.post('/bookings', async(req,res)=>{
-const booking = req.body 
-console.log(booking)
-})
-
- */
+// ..................................
 
 
     // Send a ping to confirm a successful connection
@@ -122,11 +146,7 @@ console.log(booking)
 }
 run().catch(console.dir);
 
-
-
-
-
-
+// basic setup
 app.get('/', (req,res)=>{
     res.send('our server is running')
 })

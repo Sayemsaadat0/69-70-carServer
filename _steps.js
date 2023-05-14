@@ -18,9 +18,19 @@ ${procces.env.DB_USER} evabe bosate hbe
 
 
 
+
+
+JWT TOKEN
 (require('crypto').randomBytes(64).toString('hex')  = it can generate token)
 10. npm install jsonwebtoken > 
+11.create api code
+12.when someone will login to the site the token will be safe somewhere - localstorage is the second best place to save it 
 
+13.in the handle login function inside .then(data
+    we will set access token using localstorage.setItem('name')  )
+14.when someone logged out the access token will be deleted so, same place in the logout handler we will clear item using  localStorage.removeItem()    
+
+15.after giving access token we will navigate the user , not before that
 
 
 
